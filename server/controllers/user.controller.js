@@ -1,6 +1,7 @@
 const { response } = require("express");
 const UserModel = require("../models/user.model");
 const bcrypt = require("bcrypt");
+const { isValidObjectId } = require("mongoose");
 require("dotenv").config();
 
 module.exports = {
@@ -38,21 +39,57 @@ module.exports = {
 
 
     // send list of all regiseted users
-    users: async function (req, res) {
+    getUsers: async function (req, res) {
         // pagination
         let page = req.query.page || 1;
         let limit = req.query.limit || 10;
         let startIndex = (page - 1) * limit;
         try {
-            const users = await UserModel.find().skip(startIndex).limit(limit);
+            const users = await UserModel.find().select('-password').skip(startIndex).limit(limit);
 
             // no. of users available in database
             const totalUsers = await UserModel.countDocuments();
             let totalPages = Math.ceil(totalUsers / limit);
 
-            // remove password from every user object
-            const usersList = users.map(el => delete el.password);
-            res.json({ usersList, totalPages, page });
+            res.json({ users, totalPages, page });
+        } catch (error) {
+            console.log(error);
+            res.status(500).send(error.message)
+        }
+    },
+
+    getFriends: async function (req, res) {
+        let id = req.query.id;
+        let page = req.query.page || 1;
+        let limit = req.query.limit || 10;
+        let startIndex = (page - 1) * limit;
+
+        // check for id is valid or not
+        if (!isValidObjectId(id)) return res.status(400).send({ message: "invalid user id" });
+
+        try {
+            // retrieve user with its friends data
+            let user = await UserModel.findById(id).select('-password').populate({
+                path: "friends",
+                options: {
+                    select: "-password",
+                    skip: startIndex,
+                    limit: limit,
+                }
+            });
+
+            // check for user is present or not in DB
+            if (!user) return res.status(404).send({ message: "user not found" });
+
+            // get total number of friends
+            const totalFriends = await UserModel.countDocuments({ _id: { $in: user.friends } });
+            let totalPages = Math.ceil(totalFriends / limit);
+
+            // result
+            const friends = user.friends;
+
+            res.json({ friends, totalPages, page });
+
         } catch (error) {
             console.log(error);
             res.status(500).send(error.message)
