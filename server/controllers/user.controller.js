@@ -94,5 +94,59 @@ module.exports = {
             console.log(error);
             res.status(500).send(error.message)
         }
+    },
+
+    sendRequest: async function (req, res) {
+        let { userID, friendID } = req.body;
+        // check for id is valid or not
+        if (!isValidObjectId(userID) || !isValidObjectId(friendID)) return res.status(400).send({ message: "invalid user or requested person id" });
+
+        try {
+            // add friend request to friend account
+            const friend = await UserModel.findById(friendID);
+            friend.friendRequests.push(userID);
+            await friend.save();
+            res.status(201).send({ message: "friend request sent" });
+        } catch (error) {
+            console.log(error);
+            res.status(500).send(error.message)
+        }
+    },
+
+    updateRequest: async function (req, res) {
+        let { status, userID, senderID } = req.body;
+        // check for id is valid or not
+        if (!isValidObjectId(userID) || !isValidObjectId(senderID)) return res.status(400).send({ message: "invalid user or sender id" });
+
+        try {
+            // requsest accepted
+            if (status) {
+                const user = await UserModel.findById(userID);
+                // remove id from friendRequests path
+                await user.friendRequests.findByIdAndDelete(senderID);
+                // add person into friend who sent request
+                user.friends.push(senderID);
+                await user.save();
+
+                // add person into friend who accept request
+                const sender = await UserModel.findById(senderID);
+                sender.friends.push(userID);
+                await sender.save();
+
+                res.status(204).send({ message: "requested accepted" })
+            }
+            // request rejected
+            else {
+                const user = await UserModel.findById(userID);
+                // remove id from friendRequests path
+                await user.friendRequests.findByIdAndDelete(senderID);
+                await user.save();
+                res.status(204).send({ message: "requested rejected" })
+            }
+        } catch (error) {
+            console.log(error);
+            res.status(500).send(error.message)
+        }
     }
+
 }
