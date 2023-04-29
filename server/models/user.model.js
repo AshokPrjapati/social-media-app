@@ -1,4 +1,4 @@
-const { Schema, Model } = require("mongoose");
+const { Schema, model } = require("mongoose");
 
 const userSchema = Schema({
     name: String,
@@ -11,6 +11,6 @@ const userSchema = Schema({
     friendRequests: [{ type: Schema.Types.ObjectId, ref: 'User' }]
 });
 
-const UserModel = Model("user", userSchema);
+const UserModel = model("user", userSchema);
 
 module.exports = UserModel

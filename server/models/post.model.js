@@ -1,4 +1,4 @@
-const { Schema, Model } = require("mongoose");
+const { Schema, model } = require("mongoose");
 
 const postSchema = Schema({
     user: { type: Schema.Types.ObjectId, ref: 'User' },
@@ -13,6 +13,6 @@ const postSchema = Schema({
     }]
 });
 
-const postModel = Model("post", postSchema);
+const postModel = model("post", postSchema);
 
 module.exports = postModel

@@ -1,9 +1,15 @@
 const express = require("express");
 const connection = require("./config/connect");
+const userRoute = require("./routes/user.routes");
 const app = express();
 require("dotenv").config();
 
 app.use(express.json());
+
+app.use("/", userRoute);
+app.get("/", (req, res) => {
+    res.send("Welcome")
+})
 
 let port = process.env.PORT || 8080;
 

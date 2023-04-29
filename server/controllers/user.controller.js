@@ -12,15 +12,16 @@ module.exports = {
         try {
             // checking if user already exists or not
             const user = await UserModel.findOne({ email });
-            if (user) return res.stauts(401).send({ message: "user already exists" });
+            if (user) return res.status(401).send({ message: "user already exists" });
 
             // hashing the password
-            let saltRounds = process.env.SALT_ROUNDS;
+            let saltRounds = parseInt(process.env.SALT_ROUNDS) || 5;
             try {
                 let hash = await bcrypt.hash(password, saltRounds);
                 password = hash;
             } catch (error) {
-                res.status(500).send("Something went wrong while hashing the password");
+                console.log(error)
+                return res.status(500).send("Something went wrong while hashing the password");
             }
 
             // registering the user to database
@@ -59,7 +60,7 @@ module.exports = {
     },
 
     getFriends: async function (req, res) {
-        let id = req.query.id;
+        let id = req.params.id;
         let page = req.query.page || 1;
         let limit = req.query.limit || 10;
         let startIndex = (page - 1) * limit;
@@ -97,7 +98,8 @@ module.exports = {
     },
 
     sendRequest: async function (req, res) {
-        let { userID, friendID } = req.body;
+        let userID = req.params.id;
+        let friendID = req.body.friendID;
         // check for id is valid or not
         if (!isValidObjectId(userID) || !isValidObjectId(friendID)) return res.status(400).send({ message: "invalid user or requested person id" });
 
@@ -114,7 +116,9 @@ module.exports = {
     },
 
     updateRequest: async function (req, res) {
-        let { status, userID, senderID } = req.body;
+        let userID = req.params.id;
+        let senderID = req.params.friendId;
+        let status = req.body.status;
         // check for id is valid or not
         if (!isValidObjectId(userID) || !isValidObjectId(senderID)) return res.status(400).send({ message: "invalid user or sender id" });
 
@@ -123,7 +127,10 @@ module.exports = {
             if (status) {
                 const user = await UserModel.findById(userID);
                 // remove id from friendRequests path
-                await user.friendRequests.findByIdAndDelete(senderID);
+                const index = user.friendRequests.indexOf(senderID);
+                if (index > -1) {
+                    user.friendRequests.splice(index, 1);
+                }
                 // add person into friend who sent request
                 user.friends.push(senderID);
                 await user.save();
@@ -139,7 +146,10 @@ module.exports = {
             else {
                 const user = await UserModel.findById(userID);
                 // remove id from friendRequests path
-                await user.friendRequests.findByIdAndDelete(senderID);
+                const index = user.friendRequests.indexOf(senderID);
+                if (index > -1) {
+                    user.friendRequests.splice(index, 1);
+                }
                 await user.save();
                 res.status(204).send({ message: "requested rejected" })
             }
