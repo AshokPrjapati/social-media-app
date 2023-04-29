@@ -7,10 +7,6 @@ app.use(express.json());
 
 let port = process.env.PORT || 8080;
 
-const connectDB = async () => {
-
-}
-
 app.listen(port, async () => {
     try {
         await connection;
