@@ -6,9 +6,9 @@ const userSchema = Schema({
     password: String,
     dob: Date,
     bio: String,
-    posts: [{ type: Schema.Types.ObjectId, ref: 'Post' }],
-    friends: [{ type: Schema.Types.ObjectId, ref: 'User' }],
-    friendRequests: [{ type: Schema.Types.ObjectId, ref: 'User' }]
+    posts: [{ type: Schema.Types.ObjectId, ref: 'post' }],
+    friends: [{ type: Schema.Types.ObjectId, ref: 'user' }],
+    friendRequests: [{ type: Schema.Types.ObjectId, ref: 'user' }]
 });
 
 const UserModel = model("user", userSchema);
