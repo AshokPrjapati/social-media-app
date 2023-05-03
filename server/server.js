@@ -1,15 +1,23 @@
 const express = require("express");
 const connection = require("./config/connect");
 const userRoute = require("./routes/user.routes");
+const postRoute = require("./routes/post.routes");
 const app = express();
 require("dotenv").config();
 
 app.use(express.json());
 
-app.use("/", userRoute);
+// homepage route
 app.get("/", (req, res) => {
     res.send("Welcome")
 })
+
+// user routes
+app.use("/", userRoute);
+
+// post routes
+app.use("/", postRoute);
+
 
 let port = process.env.PORT || 8080;
 
