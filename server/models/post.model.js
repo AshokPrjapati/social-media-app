@@ -11,6 +11,8 @@ const postSchema = Schema({
         text: String,
         createdAt: Date
     }]
+}, {
+    versionKey: false
 });
 
 const postModel = model("post", postSchema);

@@ -9,6 +9,8 @@ const userSchema = Schema({
     posts: [{ type: Schema.Types.ObjectId, ref: 'post' }],
     friends: [{ type: Schema.Types.ObjectId, ref: 'user' }],
     friendRequests: [{ type: Schema.Types.ObjectId, ref: 'user' }]
+}, {
+    versionKey: false
 });
 
 const UserModel = model("user", userSchema);
