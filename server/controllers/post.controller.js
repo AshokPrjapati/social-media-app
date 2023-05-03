@@ -17,7 +17,7 @@ module.exports = {
             await user.save();
             await post.save();
 
-            res.status(200).send({ message: "post added successfully" });
+            res.status(200).send({ message: "post added successfully", post });
         } catch (e) {
             console.log(e);
             res.status(500).send({ message: e.message });
@@ -52,8 +52,8 @@ module.exports = {
     deletePost: async (req, res) => {
         let id = req.params.id;
         try {
-            // get the "post" for retrieve the user id
-            let post = await postModel.findById(id);
+            // remove "post" from "posts" collection
+            let post = await postModel.findByIdAndDelete(id);
 
             // find user using user id from "post"
             let user = await UserModel.findById(post.user);
@@ -62,9 +62,6 @@ module.exports = {
             let index = user.posts.indexOf(post._id);
             if (index > -1) user.posts.splice(index, 1);
             else return res.status(404).send({ message: "post not found for this user" });
-
-            // remove "post" from "posts" collection
-            await postModel.findByIdAndDelete(id);
 
             // save updated user DB
             await user.save();
