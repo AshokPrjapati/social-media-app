@@ -24,6 +24,20 @@ module.exports = {
             console.log(error);
             res.status(500).send({ message: error.message });
         }
+    },
+
+    // update post
+    updatePost: async (req, res) => {
+        let _id = req.params.id;
+        let payload = req.body;
+        try {
+            let post = await postModel.findByIdAndUpdate({ _id }, payload);
+            console.log(post);
+            res.json({ message: "post is updated successfully" });
+        } catch (error) {
+            console.log(error);
+            res.status(500).send({ message: error.message });
+        }
     }
 
 }
