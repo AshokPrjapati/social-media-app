@@ -32,12 +32,23 @@ module.exports = {
         let payload = req.body;
         try {
             let post = await postModel.findByIdAndUpdate(id, payload);
-            console.log(post);
             res.json({ message: "post is updated successfully" });
         } catch (error) {
             console.log(error);
             res.status(500).send({ message: error.message });
         }
-    }
+    },
+
+    // delete post 
+    deletePost: async (req, res) => {
+        let id = req.params.id;
+        try {
+            let post = await postModel.findByIdAndDelete(id);
+            res.json({ message: "post is deleted successfully" });
+        } catch (error) {
+            console.log(error);
+            res.status(500).send({ message: error.message });
+        }
+    },
 
 }
