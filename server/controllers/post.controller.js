@@ -28,10 +28,10 @@ module.exports = {
 
     // update post
     updatePost: async (req, res) => {
-        let _id = req.params.id;
+        let id = req.params.id;
         let payload = req.body;
         try {
-            let post = await postModel.findByIdAndUpdate({ _id }, payload);
+            let post = await postModel.findByIdAndUpdate(id, payload);
             console.log(post);
             res.json({ message: "post is updated successfully" });
         } catch (error) {
