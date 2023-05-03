@@ -73,4 +73,22 @@ module.exports = {
         }
     },
 
+    // get specific post
+    getPost: async (req, res) => {
+        let id = req.params.id;
+        try {
+            try {
+                let post = await postModel.findById(id);
+                if (post) return res.json(post);
+                else return res.status(404).send({ message: "post not found" });
+            } catch (error) {
+                console.log(error);
+                res.status(500).send({ message: error.message });
+            }
+        } catch (error) {
+            console.log(error);
+            res.status(500).send({ message: error.message });
+        }
+    }
+
 }
